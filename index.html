@@ -500,6 +500,18 @@ function checkFile(src){
   });
 }
 
+/* Finds the real file even if the extension is .JPG / .jpg / .MP4 etc. */
+async function resolveFile(src){
+  if (!src) return null;
+  const m = src.match(/^(.*)\.([A-Za-z0-9]+)$/);
+  if (!m) return (await checkFile(src)) ? src : null;
+  const tries = [src, m[1]+'.'+m[2].toLowerCase(), m[1]+'.'+m[2].toUpperCase()];
+  for (const t of [...new Set(tries)]){
+    if (await checkFile(t)) return t;
+  }
+  return null;
+}
+
 const PLAY_ICON = '<svg viewBox="0 0 24 24"><polygon points="6,4 20,12 6,20"></polygon></svg>';
 
 async function renderGrid(filter){
@@ -507,7 +519,10 @@ async function renderGrid(filter){
   const filtered = works.filter(w => filter === 'all' || w.category === filter);
 
   for (const item of filtered){
-    const exists = await checkFile(item.file);
+    const found = await resolveFile(item.file);
+    const exists = !!found;
+    if (found) item.file = found;
+    if (item.poster){ const pf = await resolveFile(item.poster); if (pf) item.poster = pf; }
     const cell = document.createElement('div');
     cell.className = 'cell';
     cell.tabIndex = 0;
@@ -543,11 +558,11 @@ filterBtns.forEach(btn => {
 renderGrid('all');
 
 /* Try to fill the hero frame with assets/images/hero.jpg if present */
-checkFile('assets/images/hero.jpg').then(exists => {
-  if (exists){
+resolveFile('assets/images/hero.jpg').then(heroSrc => {
+  if (heroSrc){
     heroFrame.querySelector('.frame-caption').remove();
     const img = document.createElement('img');
-    img.src = 'assets/images/hero.jpg';
+    img.src = heroSrc;
     img.alt = 'Featured work';
     heroFrame.appendChild(img);
   }
