@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>John Xavier Gomez — Photo & Video Editor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --stone:#EAE7E0;
+    --panel:#F5F3EE;
+    --ink:#20241F;
+    --ink-soft:#4A4D46;
+    --red:#B23A2E;
+    --amber:#C98A3D;
+    --meta:#6B6A63;
+    --line: rgba(32,36,31,0.14);
+    --maxw: 1120px;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--stone);
+    color:var(--ink);
+    font-family:'Archivo', sans-serif;
+    font-size:16px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{
+    font-family:'Fraunces', serif;
+    margin:0;
+    font-weight:600;
+    letter-spacing:-0.01em;
+  }
+  .mono{ font-family:'IBM Plex Mono', monospace; letter-spacing:0.02em; }
+  a{color:inherit;}
+  .wrap{ max-width:var(--maxw); margin:0 auto; padding:0 28px; }
+  img, video{ max-width:100%; display:block; }
+
+  /* ---------- NAV ---------- */
+  .nav{
+    position:sticky; top:0; z-index:20;
+    background:rgba(234,231,224,0.92);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav-inner{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 28px; max-width:var(--maxw); margin:0 auto;
+  }
+  .nav-mark{ font-family:'Fraunces', serif; font-size:1.15rem; font-weight:600; }
+  .nav-links{ display:flex; gap:28px; list-style:none; margin:0; padding:0; font-size:0.92rem; }
+  .nav-links a{ text-decoration:none; color:var(--ink-soft); border-bottom:1px solid transparent; padding-bottom:2px; transition:border-color 0.2s ease, color 0.2s ease; }
+  .nav-links a:hover{ color:var(--ink); border-color:var(--red); }
+
+  /* ---------- HERO ---------- */
+  .hero{ padding:96px 0 80px; }
+  .hero-grid{ display:grid; grid-template-columns:1.1fr 0.9fr; gap:56px; align-items:center; }
+  .hero-eyebrow{ color:var(--red); font-size:0.85rem; margin-bottom:18px; }
+  .hero h1{ font-size:clamp(2.4rem, 5vw, 3.6rem); line-height:1.08; }
+  .hero p.lede{ margin-top:22px; max-width:46ch; color:var(--ink-soft); font-size:1.08rem; }
+  .hero-cta{ margin-top:32px; display:flex; gap:16px; flex-wrap:wrap; }
+  .btn{ display:inline-block; padding:13px 24px; border-radius:2px; text-decoration:none; font-size:0.95rem; font-weight:500; border:1px solid var(--ink); transition:background 0.2s ease, color 0.2s ease; }
+  .btn-solid{ background:var(--ink); color:var(--stone); }
+  .btn-solid:hover{ background:var(--red); border-color:var(--red); }
+  .btn-outline{ background:transparent; color:var(--ink); }
+  .btn-outline:hover{ border-color:var(--red); color:var(--red); }
+
+  .frame{
+    position:relative; aspect-ratio:16/10;
+    background:
+      repeating-linear-gradient(135deg, #d8d4c8 0 2px, transparent 2px 14px),
+      linear-gradient(160deg, #DEDACE, #C9C4B4);
+    border:1px solid var(--line);
+    display:flex; align-items:flex-end; padding:18px;
+    overflow:hidden;
+  }
+  .frame img, .frame video{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .frame-rec{ position:absolute; top:16px; left:18px; display:flex; align-items:center; gap:8px; font-size:0.78rem; color:var(--ink-soft); z-index:2; }
+  .rec-dot{ width:8px; height:8px; border-radius:50%; background:var(--red); animation:pulse 1.8s ease-in-out infinite; }
+  @keyframes pulse{ 0%,100%{ opacity:1; } 50%{ opacity:0.35; } }
+  .frame-caption{ font-size:0.82rem; color:var(--ink-soft); position:relative; z-index:2; }
+
+  /* ---------- SECTION HEADS ---------- */
+  section{ padding:76px 0; border-top:1px solid var(--line); }
+  .section-head{ display:grid; grid-template-columns:1fr 1fr; gap:32px; margin-bottom:44px; align-items:end; }
+  .section-head h2{ font-size:clamp(1.7rem, 3vw, 2.2rem); }
+  .section-head .section-note{ color:var(--ink-soft); max-width:42ch; font-size:0.98rem; }
+
+  /* ---------- ABOUT ---------- */
+  .about-body{ display:grid; grid-template-columns:0.9fr 1.1fr; gap:56px; }
+  .about-body p{ max-width:60ch; color:var(--ink-soft); }
+  .about-body p + p{ margin-top:16px; }
+  .stat-list{ list-style:none; margin:0; padding:0; border-top:1px solid var(--line); }
+  .stat-list li{ display:flex; justify-content:space-between; padding:14px 0; border-bottom:1px solid var(--line); font-size:0.95rem; }
+  .stat-list .num{ font-family:'Fraunces', serif; font-size:1.3rem; }
+
+  /* ---------- SERVICES ---------- */
+  .service-list{ border-top:1px solid var(--line); }
+  .service-row{ display:grid; grid-template-columns:1.4fr 2fr 0.8fr; gap:24px; padding:26px 0; border-bottom:1px solid var(--line); align-items:baseline; }
+  .service-row h3{ font-size:1.2rem; font-weight:500; }
+  .service-row p{ margin:0; color:var(--ink-soft); font-size:0.95rem; max-width:48ch; }
+  .service-row .tag{ color:var(--meta); font-size:0.82rem; text-align:right; }
+
+  /* ---------- WORK / GALLERY ---------- */
+  .filter-bar{ display:flex; gap:10px; margin-bottom:28px; flex-wrap:wrap; }
+  .filter-btn{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.8rem;
+    padding:8px 16px;
+    border:1px solid var(--line);
+    background:transparent;
+    color:var(--ink-soft);
+    cursor:pointer;
+    border-radius:2px;
+    transition:all 0.15s ease;
+  }
+  .filter-btn:hover{ border-color:var(--ink); color:var(--ink); }
+  .filter-btn.active{ background:var(--ink); color:var(--stone); border-color:var(--ink); }
+
+  .sheet{ border-top:1px dashed var(--line); border-bottom:1px dashed var(--line); padding:2px 0; }
+  .sheet-grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:2px; background:var(--line); }
+  .cell{
+    background:var(--panel);
+    aspect-ratio:4/5;
+    position:relative;
+    overflow:hidden;
+    cursor:pointer;
+  }
+  .cell img, .cell video{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transition:transform 0.3s ease; }
+  .cell:hover img, .cell:hover video{ transform:scale(1.04); }
+  .cell-empty{ display:flex; align-items:center; justify-content:center; background:
+      repeating-linear-gradient(135deg, #E2DED2 0 2px, transparent 2px 14px);
+    color:var(--meta); font-size:0.78rem; text-align:center; padding:16px;
+  }
+  .cell-overlay{
+    position:absolute; inset:auto 0 0 0;
+    background:linear-gradient(to top, rgba(32,36,31,0.75), transparent);
+    padding:28px 14px 12px;
+    display:flex; justify-content:space-between; align-items:flex-end;
+    color:#F5F3EE;
+    font-size:0.78rem;
+    opacity:0; transition:opacity 0.2s ease;
+  }
+  .cell:hover .cell-overlay, .cell:focus-within .cell-overlay{ opacity:1; }
+  .cell-play{
+    position:absolute; top:10px; right:10px;
+    width:28px; height:28px; border-radius:50%;
+    background:rgba(32,36,31,0.65);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .cell-play svg{ width:11px; height:11px; fill:#F5F3EE; }
+  .portfolio-note{ margin-top:22px; font-size:0.88rem; color:var(--meta); }
+
+  /* ---------- RESUME ---------- */
+  .resume-grid{ display:grid; grid-template-columns:1.3fr 1fr; gap:56px; }
+  .resume-list{ border-top:1px solid var(--line); }
+  .resume-row{ display:grid; grid-template-columns:130px 1fr; gap:20px; padding:22px 0; border-bottom:1px solid var(--line); align-items:baseline; }
+  .resume-row .when{ color:var(--meta); font-size:0.82rem; }
+  .resume-row h3{ font-size:1.15rem; font-weight:500; }
+  .resume-row p{ margin:4px 0 0; color:var(--ink-soft); font-size:0.95rem; }
+  .resume-side h3{ font-size:1.15rem; font-weight:500; margin-bottom:14px; }
+  .resume-side ul{ list-style:none; margin:0 0 32px; padding:0; border-top:1px solid var(--line); }
+  .resume-side li{ padding:12px 0; border-bottom:1px solid var(--line); font-size:0.95rem; color:var(--ink-soft); }
+  .resume-cta{ margin-top:36px; display:flex; gap:16px; flex-wrap:wrap; }
+
+  /* ---------- LIGHTBOX ---------- */
+  .lightbox{
+    position:fixed; inset:0; z-index:50;
+    background:rgba(20,22,18,0.94);
+    display:none; align-items:center; justify-content:center;
+    padding:32px;
+  }
+  .lightbox.open{ display:flex; }
+  .lightbox-inner{ max-width:960px; width:100%; }
+  .lightbox-media{ width:100%; max-height:76vh; background:#000; display:flex; align-items:center; justify-content:center; }
+  .lightbox-media img, .lightbox-media video{ max-height:76vh; width:auto; margin:0 auto; }
+  .lightbox-caption{ color:#EAE7E0; margin-top:16px; display:flex; justify-content:space-between; font-size:0.9rem; flex-wrap:wrap; gap:8px; }
+  .lightbox-close{
+    position:absolute; top:24px; right:32px;
+    color:#EAE7E0; background:none; border:none;
+    font-size:1.6rem; cursor:pointer; line-height:1;
+  }
+
+  /* ---------- CONTACT / FOOTER ---------- */
+  .contact{ background:var(--ink); color:var(--stone); padding:88px 0 48px; border-top:none; }
+  .contact h2{ color:var(--stone); font-size:clamp(1.9rem, 4vw, 2.6rem); max-width:16ch; }
+  .contact-grid{ display:grid; grid-template-columns:1.3fr 1fr; gap:48px; margin-top:36px; }
+  .contact-links{ list-style:none; margin:0; padding:0; }
+  .contact-links li{ border-top:1px solid rgba(234,231,224,0.18); padding:16px 0; }
+  .contact-links li:last-child{ border-bottom:1px solid rgba(234,231,224,0.18); }
+  .contact-links a{ text-decoration:none; font-size:1.05rem; display:flex; justify-content:space-between; color:var(--stone); }
+  .contact-links a:hover{ color:var(--amber); }
+  .contact-links .arrow{ color:var(--meta); }
+  .foot-note{ margin-top:64px; display:flex; justify-content:space-between; font-size:0.8rem; color:#93938C; flex-wrap:wrap; gap:8px; }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width: 820px){
+    .hero-grid{ grid-template-columns:1fr; }
+    .hero{ padding:64px 0 56px; }
+    .section-head{ grid-template-columns:1fr; gap:12px; }
+    .about-body{ grid-template-columns:1fr; gap:32px; }
+    .service-row{ grid-template-columns:1fr; gap:6px; }
+    .service-row .tag{ text-align:left; }
+    .sheet-grid{ grid-template-columns:repeat(2, 1fr); }
+    .contact-grid{ grid-template-columns:1fr; }
+    .resume-grid{ grid-template-columns:1fr; gap:32px; }
+    .resume-row{ grid-template-columns:1fr; gap:4px; }
+    .nav-links{ display:none; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .rec-dot{ animation:none; }
+    html{ scroll-behavior:auto; }
+    .cell img, .cell video{ transition:none; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-mark">John Xavier Gomez</div>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#resume">Resume</a></li>
+      <li><a href="#work">Work</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="hero-eyebrow mono">Davao, Philippines</div>
+      <h1>Photo &amp; video editing for brands that post daily and can't afford to look tired.</h1>
+      <p class="lede">I cut short form reels, edit event photography, and run social accounts end to end — from raw footage to a caption that actually gets read.</p>
+      <div class="hero-cta">
+        <a href="#work" class="btn btn-solid">See the work</a>
+        <a href="#contact" class="btn btn-outline">Get in touch</a>
+      </div>
+    </div>
+    <div class="frame" id="hero-frame">
+      <div class="frame-rec"><span class="rec-dot"></span><span class="mono">REC</span></div>
+      <div class="frame-caption mono">Add assets/images/hero.jpg to replace this</div>
+    </div>
+  </div>
+</header>
+
+<section id="about">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Five years behind the timeline, not just the camera.</h2>
+      <p class="section-note">A short version of how I got here and what I actually spend my days doing.</p>
+    </div>
+    <div class="about-body">
+      <div>
+        <p>I started out fixing phones and messing with cameras, which turned into freelance photography, then into editing other people's footage, then into running whole social accounts. Somewhere in there "media guy" became the job title.</p>
+        <p>These days most of my work is same-day event edits, short-form reels for Facebook and TikTok, and the social calendar behind them. I'm also teaching myself workflow automation, so the boring parts of running a content pipeline — bookings, approvals, handoffs — take less of everyone's time.</p>
+      </div>
+      <ul class="stat-list">
+        <li><span>Years editing photo &amp; video</span><span class="num">5+</span></li>
+        <li><span>Same-day turnaround edits</span><span class="num">Yes</span></li>
+        <li><span>English proficiency</span><span class="num">C2</span></li>
+        <li><span>Currently studying</span><span class="num mono">n8n</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="services">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>What I take on</h2>
+      <p class="section-note">Most clients start with one of these and hand over more once the first batch lands well.</p>
+    </div>
+    <div class="service-list">
+      <div class="service-row">
+        <h3>Photo editing</h3>
+        <p>Color correction, retouching, and batch culling for events, products, and portraits.</p>
+        <span class="tag mono">Per shoot / per batch</span>
+      </div>
+      <div class="service-row">
+        <h3>Short-form video editing</h3>
+        <p>Reels, TikToks, and recap videos cut for retention — pacing, captions, and audio sync included.</p>
+        <span class="tag mono">Per video / bulk</span>
+      </div>
+      <div class="service-row">
+        <h3>Social media management</h3>
+        <p>Content calendars, posting, and day-to-day account upkeep across Instagram, TikTok, and Facebook.</p>
+        <span class="tag mono">Monthly</span>
+      </div>
+      <div class="service-row">
+        <h3>Workflow automation</h3>
+        <p>n8n setups that connect forms, sheets, and calendars so bookings and approvals don't need a person watching an inbox.</p>
+        <span class="tag mono">Project-based</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="resume">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Resume</h2>
+      <p class="section-note">Where I've worked, what I use, and what I've won.</p>
+    </div>
+    <div class="resume-grid">
+      <div>
+        <div class="resume-list">
+          <div class="resume-row">
+            <span class="when mono">2020 – Present</span>
+            <div>
+              <h3>Freelance Photographer</h3>
+              <p>Independent. Event and portrait photography, with the editing handled in-house.</p>
+            </div>
+          </div>
+          <div class="resume-row">
+            <span class="when mono">2024 – 2025</span>
+            <div>
+              <h3>Productions Manager</h3>
+              <p>HCDC CETSO, Holy Cross of Davao College. Led the productions team for school org events and media.</p>
+            </div>
+          </div>
+          <div class="resume-row">
+            <span class="when mono">2023 – 2024</span>
+            <div>
+              <h3>Productions Committee</h3>
+              <p>HCDC CETSO, Holy Cross of Davao College.</p>
+            </div>
+          </div>
+        </div>
+        <div class="resume-cta">
+          <a href="assets/resume.pdf" download class="btn btn-solid">Download resume (PDF)</a>
+          <a href="assets/resume.pdf" target="_blank" rel="noopener" class="btn btn-outline">View in browser</a>
+        </div>
+      </div>
+      <div class="resume-side">
+        <h3>Tools</h3>
+        <ul>
+          <li>Adobe Premiere Pro</li>
+          <li>Premiere Rush</li>
+          <li>CapCut</li>
+          <li>Lightroom</li>
+        </ul>
+        <h3>Awards</h3>
+        <ul>
+          <li>2nd Runner Up, CODEE RXI Engineering Congress 2026, LPU Davao</li>
+          <li>Co-Director, Inter-School short video competition</li>
+        </ul>
+        <h3>Education</h3>
+        <ul>
+          <li>BS Computer Engineering, Holy Cross of Davao College</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="work">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Selected work</h2>
+      <p class="section-note"></p>
+    </div>
+    <div class="filter-bar">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="pubmat">Pubmats</button>
+      <button class="filter-btn" data-filter="photo-edit">Photo Edits</button>
+      <button class="filter-btn" data-filter="views">Views</button>
+      <button class="filter-btn" data-filter="video">Videos</button>
+    </div>
+    <div class="sheet">
+      <div class="sheet-grid" id="gallery-grid"></div>
+    </div>
+    <p class="portfolio-note"></p>
+  </div>
+</section>
+
+<section id="contact" class="contact" style="border-top:none;">
+  <div class="wrap">
+    <h2>Have something to edit, post, or automate?</h2>
+    <div class="contact-grid">
+      <ul class="contact-links">
+        <li><a href="mailto:jxviergomez2@gmail.com">jxviergomez2@gmail.com<span class="arrow mono">→</span></a></li>
+        <li><a href="https://www.instagram.com/nicht.siebzehn" target="_blank" rel="noopener">Instagram<span class="arrow mono">→</span></a></li>
+        <li><a href="https://www.facebook.com/jxavier.gomez.9/" target="_blank" rel="noopener">Facebook<span class="arrow mono">→</span></a></li>
+        <li><a href="https://www.onlinejobs.ph/jobseekers/info/5365618" target="_blank" rel="noopener">OnlineJobs.ph profile<span class="arrow mono">→</span></a></li>
+      </ul>
+      <div>
+        <p style="color:#B9B7AE; max-width:36ch; font-size:0.95rem;">Based in Davao, Philippines. Usually replies within a day. Same-day turnaround available for event work.</p>
+      </div>
+    </div>
+    <div class="foot-note">
+      <span>John Xavier Gomez — Photo &amp; Video Editor</span>
+      <span class="mono">Updated 2026</span>
+    </div>
+  </div>
+</section>
+
+
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" id="lightbox-close" aria-label="Close">&times;</button>
+  <div class="lightbox-inner">
+    <div class="lightbox-media" id="lightbox-media"></div>
+    <div class="lightbox-caption">
+      <span id="lightbox-title"></span>
+      <span id="lightbox-tag" class="mono"></span>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =====================================================================
+   HOW TO ADD YOUR OWN WORK
+   ---------------------------------------------------------------------
+   1. Put your image files inside:  assets/images/
+      Put your video files inside:  assets/videos/
+      (Keep filenames simple, no spaces — e.g. wedding-recap-01.jpg)
+
+   2. Add one entry to the "works" list below for each item.
+      Copy an existing entry and change the four values:
+
+      For a photo:
+        { type: "photo", title: "Wedding recap", tag: "Photo",
+          file: "assets/images/wedding-recap-01.jpg" }
+
+      For a video (self-hosted file, plays with built-in controls):
+        { type: "video", title: "Same-day highlight edit", tag: "Video",
+          file: "assets/videos/highlight-01.mp4",
+          poster: "assets/images/highlight-01-poster.jpg" }
+        (poster is optional — it's the thumbnail shown before play)
+
+   3. Save the file and refresh the page. That's it — no other part
+      of the file needs to change.
+
+   4. Keep video files reasonably small (compress before uploading —
+      HandBrake is a free tool for this) so the site loads fast.
+   ===================================================================== */
+
+const works = [
+  { type: "photo", category: "pubmat", title: "Pubmat 1", tag: "Pubmat", file: "assets/images/pubmat-01.jpg" },
+  { type: "photo", category: "pubmat", title: "Pubmat 2", tag: "Pubmat", file: "assets/images/pubmat-02.jpg" },
+  { type: "photo", category: "pubmat", title: "Pubmat 3", tag: "Pubmat", file: "assets/images/pubmat-03.jpg" },
+  { type: "photo", category: "pubmat", title: "Pubmat 4", tag: "Pubmat", file: "assets/images/pubmat-04.jpg" },
+  { type: "photo", category: "pubmat", title: "Pubmat 5", tag: "Pubmat", file: "assets/images/pubmat-05.jpg" },
+  { type: "photo", category: "pubmat", title: "Pubmat 6", tag: "Pubmat", file: "assets/images/pubmat-06.jpg" },
+  { type: "photo", category: "pubmat", title: "Pubmat 7", tag: "Pubmat", file: "assets/images/pubmat-07.jpg" },
+  { type: "photo", category: "pubmat", title: "Pubmat 8", tag: "Pubmat", file: "assets/images/pubmat-08.jpg" },
+  { type: "photo", category: "pubmat", title: "Pubmat 9", tag: "Pubmat", file: "assets/images/pubmat-09.jpg" },
+  { type: "photo", category: "pubmat", title: "Pubmat 10", tag: "Pubmat", file: "assets/images/pubmat-10.jpg" },
+  { type: "photo", category: "photo-edit", title: "Photo Edit 1", tag: "Photo Edit", file: "assets/images/photo-edit-01.jpg" },
+  { type: "photo", category: "photo-edit", title: "Photo Edit 2", tag: "Photo Edit", file: "assets/images/photo-edit-02.jpg" },
+  { type: "photo", category: "photo-edit", title: "Photo Edit 3", tag: "Photo Edit", file: "assets/images/photo-edit-03.jpg" },
+  { type: "photo", category: "photo-edit", title: "Photo Edit 4", tag: "Photo Edit", file: "assets/images/photo-edit-04.jpg" },
+  { type: "photo", category: "photo-edit", title: "Photo Edit 5", tag: "Photo Edit", file: "assets/images/photo-edit-05.jpg" },
+  { type: "photo", category: "photo-edit", title: "Photo Edit 6", tag: "Photo Edit", file: "assets/images/photo-edit-06.jpg" },
+  { type: "photo", category: "photo-edit", title: "Photo Edit 7", tag: "Photo Edit", file: "assets/images/photo-edit-07.jpg" },
+  { type: "photo", category: "photo-edit", title: "Photo Edit 8", tag: "Photo Edit", file: "assets/images/photo-edit-08.jpg" },
+  { type: "photo", category: "photo-edit", title: "Photo Edit 9", tag: "Photo Edit", file: "assets/images/photo-edit-09.jpg" },
+  { type: "photo", category: "photo-edit", title: "Photo Edit 10", tag: "Photo Edit", file: "assets/images/photo-edit-10.jpg" },
+  { type: "photo", category: "photo-edit", title: "Photo Edit 11", tag: "Photo Edit", file: "assets/images/photo-edit-11.jpg" },
+  { type: "photo", category: "photo-edit", title: "Photo Edit 12", tag: "Photo Edit", file: "assets/images/photo-edit-12.jpg" },
+  { type: "photo", category: "photo-edit", title: "Photo Edit 13", tag: "Photo Edit", file: "assets/images/photo-edit-13.jpg" },
+  { type: "photo", category: "photo-edit", title: "Photo Edit 14", tag: "Photo Edit", file: "assets/images/photo-edit-14.jpg" },
+  { type: "photo", category: "photo-edit", title: "Photo Edit 15", tag: "Photo Edit", file: "assets/images/photo-edit-15.jpg" },
+  { type: "photo", category: "photo-edit", title: "Photo Edit 16", tag: "Photo Edit", file: "assets/images/photo-edit-16.jpg" },
+  { type: "photo", category: "photo-edit", title: "Photo Edit 17", tag: "Photo Edit", file: "assets/images/photo-edit-17.jpg" },
+  { type: "photo", category: "photo-edit", title: "Photo Edit 18", tag: "Photo Edit", file: "assets/images/photo-edit-18.jpg" },
+  { type: "photo", category: "photo-edit", title: "Photo Edit 19", tag: "Photo Edit", file: "assets/images/photo-edit-19.jpg" },
+  { type: "photo", category: "photo-edit", title: "Photo Edit 20", tag: "Photo Edit", file: "assets/images/photo-edit-20.jpg" },
+  { type: "photo", category: "photo-edit", title: "Photo Edit 21", tag: "Photo Edit", file: "assets/images/photo-edit-21.jpg" },
+  { type: "photo", category: "photo-edit", title: "Photo Edit 22", tag: "Photo Edit", file: "assets/images/photo-edit-22.jpg" },
+  { type: "photo", category: "views", title: "Views Screenshot 1", tag: "Views / Analytics", file: "assets/images/views-01.jpg" },
+  { type: "photo", category: "views", title: "Views Screenshot 2", tag: "Views / Analytics", file: "assets/images/views-02.jpg" },
+  { type: "photo", category: "views", title: "Views Screenshot 3", tag: "Views / Analytics", file: "assets/images/views-03.jpg" },
+  { type: "video", category: "video", title: "Reel", tag: "Video • Reel", file: "assets/videos/reel.mp4", poster: "assets/images/reel-poster.jpg" },
+  { type: "video", category: "video", title: "Same-Day Edit (SDE)", tag: "Video • SDE", file: "assets/videos/sde.mp4", poster: "assets/images/sde-poster.jpg" },
+  { type: "video", category: "video", title: "Project Video", tag: "Video • Project", file: "assets/videos/project-video.mp4", poster: "assets/images/project-video-poster.jpg" }
+];
+
+const grid = document.getElementById('gallery-grid');
+const heroFrame = document.getElementById('hero-frame');
+
+function checkFile(src){
+  return new Promise((resolve) => {
+    const isVideo = /\.(mp4|webm|mov)$/i.test(src);
+    const el = document.createElement(isVideo ? 'video' : 'img');
+    el.onload = () => resolve(true);
+    el.onloadeddata = () => resolve(true);
+    el.onerror = () => resolve(false);
+    if (isVideo){ el.src = src; el.load(); } else { el.src = src; }
+  });
+}
+
+const PLAY_ICON = '<svg viewBox="0 0 24 24"><polygon points="6,4 20,12 6,20"></polygon></svg>';
+
+async function renderGrid(filter){
+  grid.innerHTML = '';
+  const filtered = works.filter(w => filter === 'all' || w.category === filter);
+
+  for (const item of filtered){
+    const exists = await checkFile(item.file);
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+    cell.tabIndex = 0;
+
+    if (exists){
+      if (item.type === 'photo'){
+        cell.innerHTML = `<img src="${item.file}" alt="${item.title}">`;
+      } else {
+        const posterAttr = item.poster ? ` poster="${item.poster}"` : '';
+        cell.innerHTML = `<video src="${item.file}"${posterAttr} muted playsinline></video>
+          <div class="cell-play">${PLAY_ICON}</div>`;
+      }
+      cell.innerHTML += `<div class="cell-overlay"><span>${item.title}</span><span class="mono">${item.tag}</span></div>`;
+      cell.addEventListener('click', () => openLightbox(item));
+      cell.addEventListener('keydown', (e) => { if (e.key === 'Enter') openLightbox(item); });
+    } else {
+      cell.classList.add('cell-empty');
+      cell.innerHTML = `<span class="mono">${item.file}<br>not added yet</span>`;
+    }
+    grid.appendChild(cell);
+  }
+}
+
+const filterBtns = document.querySelectorAll('.filter-btn');
+filterBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    filterBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderGrid(btn.dataset.filter);
+  });
+});
+
+renderGrid('all');
+
+/* Try to fill the hero frame with assets/images/hero.jpg if present */
+checkFile('assets/images/hero.jpg').then(exists => {
+  if (exists){
+    heroFrame.querySelector('.frame-caption').remove();
+    const img = document.createElement('img');
+    img.src = 'assets/images/hero.jpg';
+    img.alt = 'Featured work';
+    heroFrame.appendChild(img);
+  }
+});
+
+/* Lightbox */
+const lightbox = document.getElementById('lightbox');
+const lightboxMedia = document.getElementById('lightbox-media');
+const lightboxTitle = document.getElementById('lightbox-title');
+const lightboxTag = document.getElementById('lightbox-tag');
+
+function openLightbox(item){
+  lightboxMedia.innerHTML = item.type === 'photo'
+    ? `<img src="${item.file}" alt="${item.title}">`
+    : `<video src="${item.file}" controls autoplay playsinline></video>`;
+  lightboxTitle.textContent = item.title;
+  lightboxTag.textContent = item.tag;
+  lightbox.classList.add('open');
+}
+function closeLightbox(){
+  lightbox.classList.remove('open');
+  lightboxMedia.innerHTML = '';
+}
+document.getElementById('lightbox-close').addEventListener('click', closeLightbox);
+lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLightbox(); });
+</script>
+
+</body>
+</html>
